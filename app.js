@@ -29,7 +29,9 @@ const userSchema = {
 const User = mongoose.model("User", userSchema);
 
 let count = 0;
+let currentuser = new User();
 let portals = [];
+let prescriptions = [];
 
 app.get("/", function(req, res){
   res.sendFile(__dirname+"/views/index.html");
@@ -66,13 +68,6 @@ app.post("/signup", function(req, res){
 
   user.save();
 
-  var name = firstname + lastname;
-  const portal = {
-    name: name
-  };
-
-  portals.push(portal);
-
   res.redirect("/");
 
 });
@@ -87,13 +82,22 @@ app.post("/login", function(req, res){
   var employee = req.body.employee;
   console.log(userID, password, employee);
 
+
+
   User.findOne({_id: userID}, function(err, user){
     if (err){
       console.log(err);
     } else{
       if (user.password === password){
+        let name = user.firstname + " " + user.lastname;
+        const portal = {
+          name: name
+        };
+
+        portals.push(portal);
+          currentuser = user;
         res.redirect("/:portalName");
-        console.log("Success");
+        console.log(user.name);
       } else {
         console.log("fail");
       }
@@ -105,9 +109,26 @@ app.post("/login", function(req, res){
 
 app.get("/:portalName", function(req, res){
 portals.forEach(function(portal){
-  if(_.lowerCase(req.params.postName) === _.lowerCase(portal.name)){
-    res.render("portal", {title: portal.name, content: "portal.body"});
+  console.log(portal);
+  if(currentuser.employee === "on") {
+    res.render("employeeportal", {
+      name: portal.name,
+      content: "employee",
+      prescriptions: prescriptions,
+      user: currentuser
+    });
+    portals.pop();
+  } else {
+      prescriptions.push("Ibuprofen");
+        res.render("patientportal", {
+          name: portal.name,
+          content: "patient",
+          prescriptions: prescriptions,
+          user: currentuser
+        });
+        portals.pop();
   }
+
 });
 });
 

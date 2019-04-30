@@ -1,0 +1,22 @@
+<%- include("partials/header"); -%>
+
+  <h1> <%= name %> </h1>
+  <p> <%= content %> </p>
+
+<h3>Prescriptions</h3>
+  <div class="box">
+    <% for(var i=0; i < prescriptions.length; i++){ %>
+      <div class="item">
+        <input type="checkbox">
+      <p class="para"><%= prescriptions[i]%></p>
+
+    </div>
+    <% } %>
+    <form class="item" action="/" method="post">
+      <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+      <button type="submit" name="list">+</button>
+    </form>
+</div>
+
+
+<%- include("partials/footer"); -%>

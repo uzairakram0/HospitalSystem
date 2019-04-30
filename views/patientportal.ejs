@@ -1,0 +1,25 @@
+<%- include("partials/header"); -%>
+<div id="container">
+  <h1> <%= name %> </h1>
+  <p> <%= content %> </p>
+
+<h3>Prescriptions</h3>
+  <div class="box">
+    <% for(var i=0; i < prescriptions.length; i++){ %>
+      <div class="item">
+        <input type="checkbox">
+      <p class="para"><%= prescriptions[i]%></p>
+    </div>
+    <% } %>
+</div>
+
+
+<label>Date of birth</label>
+<p> <%= user.DoB %> </p>
+<label>gender</label>
+<p> <%= user.gender %> </p>
+<label>Email</label>
+<p> <%= user.email %> </p>
+</div>
+
+<%- include("partials/footer"); -%>

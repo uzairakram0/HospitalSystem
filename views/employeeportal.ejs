@@ -1,0 +1,19 @@
+<%- include("partials/header"); -%>
+<div id="container">
+  <h1> <%= name %> </h1>
+  <p> <%= content %> </p>
+
+<h3>Patients</h3>
+  <div>
+    <% for(var i=0; i < prescriptions.length; i++){ %>
+      <div class="item">
+        <input type="checkbox">
+      <p class="para"><%= prescriptions[i]%></p>
+    </div>
+    <% } %>
+</div>
+
+</div>
+
+
+<%- include("partials/footer"); -%>
