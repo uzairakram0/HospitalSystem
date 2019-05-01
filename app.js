@@ -80,31 +80,58 @@ app.post("/login", function(req, res){
   var userID = req.body.userid;
   var password = req.body.password;
   var employee = req.body.employee;
-  console.log(userID, password, employee);
-
-
-
+  
   User.findOne({_id: userID}, function(err, user){
     if (err){
       console.log(err);
     } else{
-      if (user.password === password){
+      if(user.firstname === "admin"){
+        console.log("admin account found");
+        res.redirect("/adminPage");
+      } else if (user.password === password){
         let name = user.firstname + " " + user.lastname;
-        const portal = {
-          name: name
-        };
+        const portal = {name};
 
         portals.push(portal);
           currentuser = user;
         res.redirect("/:portalName");
-        console.log(user.name);
       } else {
         console.log("fail");
       }
     }
 
   });
+});
 
+app.get("/adminPage", function(req, res){
+  User.find({}).exec( function(err, user){
+    res.render("adminPortal", {
+      users: user,
+      employment: user.employee
+    });
+  });
+});
+
+app.post("/promote", function(req, res){
+  var promotees = { _id: req.body.patients };
+  console.log(promotees._id);
+  User.findOneAndUpdate({ _id: promotees._id }, {$set: {employee: "on"}}, {new: true}, (err, doc) => {
+    if(err){
+      console.log("update failed");
+    }
+  });
+  res.redirect("/adminPage");
+});
+
+app.post("/demote", function(req, res){
+  var demotees = { _id: req.body.employees };
+  console.log(demotees._id);
+  User.findOneAndUpdate({ _id: demotees._id }, {$set: {employee: "off"}}, {new: true}, (err, doc) => {
+    if(err){
+      console.log("update failed");
+    }
+  });
+  res.redirect("/adminPage");
 });
 
 app.get("/:portalName", function(req, res){
@@ -131,6 +158,7 @@ portals.forEach(function(portal){
 
 });
 });
+
 
 
 app.listen(3000, function(){

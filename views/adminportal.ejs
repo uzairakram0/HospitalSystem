@@ -1,0 +1,56 @@
+<%- include("partials/header"); -%>
+<style type="text/css">
+	input{
+		margin: auto;
+	}
+</style>
+<body>
+	
+    <div class="container">
+    
+      <div class="row">
+        <div class="col-lg-12">
+          <h3 class="text-center"> Admin Page</h3>
+        </div>
+      </div>
+      <div class="row top30">
+      	<div class="col-lg-6 col-lg-offset-3">
+        	<div class="col-lg-5">
+          		<h4 class="text-center"> Patients </h4>
+          		<form action="/promote" method="post">
+          		<ul class="users list-group">
+ 			 		<% for(var i=0; i<users.length; i++) { %>
+ 			 			<% if(users[i].employee != "on" && users[i].firstname != "admin"){ %>
+    						<li class="list-group-item">
+      							<input type="checkbox" name="patients" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input>
+    						</li>
+    					<% } %>
+  					<% } %>
+					<button class="btn" type="submit">Promote to employee</button>
+				</ul>
+				</form>
+       	 </div>
+        	<div class="col-lg-5 col-lg-offset-2 ">
+        	 	<h4 class="text-center"> Employees </h4>
+        	 	<form action="/demote" method="post">
+         	 		<ul class="users list-group"">
+ 				 		<% for(var i=0; i<users.length; i++) { %>
+ 				 			<% if(users[i].employee == "on"){ %>
+    							<li class="list-group-item text-center">
+      								<span><input type="checkbox" name ="employees" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input></span>
+    							</li>
+    						<% } %>
+  						<% } %>
+  						<button class="btn" type="submit">Demote to patient</button>
+					</ul>
+				</form>
+        	</div>
+      	</div>
+      </div> 
+    </div>   
+ 
+ </body>
+
+
+
+<%- include("partials/footer"); -%>
