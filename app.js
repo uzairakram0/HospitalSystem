@@ -1,4 +1,5 @@
 //jshint esversion: 6
+
 /*packages*/
 
 const express = require("express");
@@ -26,7 +27,49 @@ const userSchema = {
   employee: String
 };
 
+const patientSchema = {
+  _id: String,
+  patient: userSchema,
+  physician: userSchema,
+  history: [
+    {
+      title: String,
+      body: String
+    }
+  ],
+  prescriptions: [
+    {
+      
+    }
+  ],
+  appointments: [
+    {
+
+  }
+]
+};
+
+const employeeSchema = {
+  _id: String,
+  emp: userSchema,
+  patients: [
+    {
+      patient: patientSchema
+    }
+  ],
+  schedule: [
+    {
+
+    }
+  ]
+
+};
+
+
+
 const User = mongoose.model("User", userSchema);
+const Employee = mongoose.model("Employee", employeeSchema);
+const Patient = mongoose.model("Patient", patientSchema);
 
 let count = 0;
 let currentuser = new User();
@@ -48,12 +91,12 @@ app.post("/signup", function(req, res){
   var gender = req.body.gender;
   var email = req.body.email;
   var password = req.body.password;
-  var employee = req.body.employee;
+  var status = req.body.employee;
 
   var id =  firstname.charAt(0) + lastname.charAt(0) + count.toString();
   count++;
 
-  console.log(id, firstname, lastname, birthdate, gender, email, password, employee);
+  console.log(id, firstname, lastname, birthdate, gender, email, password, status);
 
   const user = new User({
     _id: id,
@@ -63,10 +106,24 @@ app.post("/signup", function(req, res){
     gender: gender,
     email: email,
     password: password,
-    employee: employee
+    employee: status
   });
 
   user.save();
+
+  if (status === "on"){
+    const employee = new Employee({
+      _id: id,
+      emp: user
+    });
+    employee.save();
+  } else {
+    const patient = new Patient({
+      _id: id,
+      patient: user
+    });
+    patient.save();
+  }
 
   res.redirect("/");
 
@@ -131,6 +188,11 @@ portals.forEach(function(portal){
 
 });
 });
+
+app.get("/schedule", function(req, res){
+  res.sendFile(__dirname+"schedule-template-master/index.html");
+});
+
 
 
 app.listen(3000, function(){
