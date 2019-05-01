@@ -115,22 +115,24 @@ app.get("/adminPage", function(req, res){
 app.post("/promote", function(req, res){
   var promotees = { _id: req.body.patients };
   console.log(promotees._id);
-  User.findOneAndUpdate({ _id: promotees._id }, {$set: {employee: "on"}}, {new: true}, (err, doc) => {
-    if(err){
-      console.log("update failed");
-    }
-  });
+  User.updateMany(
+    { _id: promotees._id },
+    {$set: {employee: "on"} },
+    {},
+    (err,writeResult) => {}
+  );
   res.redirect("/adminPage");
 });
 
 app.post("/demote", function(req, res){
   var demotees = { _id: req.body.employees };
   console.log(demotees._id);
-  User.findOneAndUpdate({ _id: demotees._id }, {$set: {employee: "off"}}, {new: true}, (err, doc) => {
-    if(err){
-      console.log("update failed");
-    }
-  });
+  User.updateMany(
+    { _id: demotees._id },
+    {$set: {employee: "off"} },
+    {},
+    (err,writeResult) => {}
+  );
   res.redirect("/adminPage");
 });
 
