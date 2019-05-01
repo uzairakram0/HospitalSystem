@@ -3,6 +3,17 @@
 	input{
 		margin: auto;
 	}
+	button{
+		width: 100%;
+		background-color: lightblue;
+		color: black;
+		margin-top: 5px;
+	}
+	#display{
+		overflow: scroll;
+		height: 200px;
+		overflow-x: hidden;
+	}
 </style>
 <body>
 	
@@ -18,7 +29,7 @@
         	<div class="col-lg-5">
           		<h4 class="text-center"> Patients </h4>
           		<form action="/promote" method="post">
-          		<ul class="users list-group">
+          		<ul class="users list-group" id="display">
  			 		<% for(var i=0; i<users.length; i++) { %>
  			 			<% if(users[i].employee != "on" && users[i].firstname != "admin"){ %>
     						<li class="list-group-item">
@@ -26,14 +37,15 @@
     						</li>
     					<% } %>
   					<% } %>
-					<button class="btn" type="submit">Promote to employee</button>
 				</ul>
+				<button class="btn" type="submit">Promote to employee</button>
+				
 				</form>
        	 </div>
         	<div class="col-lg-5 col-lg-offset-2 ">
         	 	<h4 class="text-center"> Employees </h4>
         	 	<form action="/demote" method="post">
-         	 		<ul class="users list-group"">
+         	 		<ul class="users list-group" id="display">
  				 		<% for(var i=0; i<users.length; i++) { %>
  				 			<% if(users[i].employee == "on"){ %>
     							<li class="list-group-item text-center">
@@ -41,8 +53,9 @@
     							</li>
     						<% } %>
   						<% } %>
-  						<button class="btn" type="submit">Demote to patient</button>
-					</ul>
+  					</ul>	
+  					<button class="btn" type="submit">Demote to patient</button>
+					
 				</form>
         	</div>
       	</div>
