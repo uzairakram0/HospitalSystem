@@ -1,11 +1,12 @@
 <%- include("partials/header"); -%>
 
 <style type="text/css">
-	#perc{
+	#display{
 		overflow: scroll;
-		overflow-x: hidden;
 		height: 200px;
-		width: 100%;
+		overflow-x: hidden;
+		outline: .5px lightgrey solid;
+		background-color: white;
 	}
 	
 	#container{
@@ -20,6 +21,11 @@
 		margin-top: 10px;
 		outline: 1px solid black;
 	}
+	#boxes{
+		height: 60px;
+		text-align: center;
+		margin:5px;
+	}
 </style>
 
 <div class="container">
@@ -32,11 +38,11 @@
 		<div class="col-lg-3" id="container">
 			<h3 class="text-center">User Info</h3>
 			<label>Date of birth</label>
-				<p> <%= user.DoB %> </p>
+				<p> <%= user.patient.DoB %> </p>
 			<label>Gender</label>
-				<p> <%= user.gender %> </p>
+				<p> <%= user.patient.gender %> </p>
 			<label>Email</label>
-				<p> <%= user.email %> </p>
+				<p> <%= user.patient.email %> </p>
 		</div>
 
 		<div class="col-lg-4 col-lg-offset-1 " id="container">
@@ -53,6 +59,15 @@
 
 		<div class="col-lg-3 col-lg-offset-1 " id="container">
 			<h3 class="text-center">Upcoming Appointments</h3>
+				<ul class="users list-group" id="display">
+ 			 		<% if(appointments.length > 0) { %>
+ 			 			<% for(var i=0; i<appointments.length; i++) { %> 
+    						<li>
+      							<div class="box" id="boxes"><h4>Appointment on:</h4><%=appointments[i].date%> <%=appointments[i].time%></div>
+    						</li>
+    					<% } %>
+  					<% } %>
+				</ul>
 		</div>
 	</div>
 </div>

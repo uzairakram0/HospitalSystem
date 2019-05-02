@@ -146,19 +146,19 @@ app.post("/login", function(req, res){
   var password = req.body.password;
   var employee = req.body.employee;
   
-  User.findOne({_id: userID}, function(err, user){
+  Patient.findOne({'patient._id': userID}, function(err, user){
     if (err){
       console.log(err);
     } else{
-      if(user.firstname === "admin"){
+      if(user.patient.firstname === "admin"){
         console.log("admin account found");
         res.redirect("/adminPage");
-      } else if (user.password === password){
-        let name = user.firstname + " " + user.lastname;
+      } else if (user.patient.password === password){
+        let name = user.patient.firstname + " " + user.patient.lastname;
         const portal = {name};
 
         portals.push(portal);
-          currentuser = user;
+        currentuser = user;
         res.redirect("/:portalName");
       } else {
         console.log("fail");
@@ -214,12 +214,14 @@ portals.forEach(function(portal){
     Patient.find({'patient._id': currentuser._id}, function(err, user){
       currentuser = user;
     });
+    console.log(currentuser.appointments);
       prescriptions.push("Ibuprofen");
         res.render("patientportal", {
           name: portal.name,
           content: "patient",
           prescriptions: prescriptions,
           user: currentuser,
+          appointments: currentuser.appointments
         });
         portals.pop();
   }
@@ -235,8 +237,9 @@ app.post("/makeApp", function(req, res){
     var tempApp = {date: appDate, time: appTime};
     user.appointments.push(tempApp);
     user.save();
+    console.log(user);
   });
-  res.redirect("/:portalName");
+
 });
 app.get("/schedule", function(req, res){
   res.sendFile(__dirname+"schedule-template-master/index.html");
