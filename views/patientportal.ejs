@@ -1,25 +1,40 @@
 <%- include("partials/header"); -%>
-<div id="container">
-  <h1> <%= name %> </h1>
-  <p> <%= content %> </p>
+<style type="text/css">
+	#perc{
+		overflow: scroll;
+		overflow-x: hidden;
+		height: 200px;
+		width: 100%;
+	}
+</style>
+<div class="container">
+	<div class="row">
+		<div id="col-lg-4">
+		  <h1 class= "text-center"> <%= content %> </p>
+		  <h1> <%= name %> </h1>
+		  
+		<div class="col-lg-4">
+			<h3 class="text-center">User Info</h3>
+			<label>Date of birth</label>
+				<p> <%= user.DoB %> </p>
+			<label>Gender</label>
+				<p> <%= user.gender %> </p>
+			<label>Email</label>
+				<p> <%= user.email %> </p>
+		</div>
 
-<h3>Prescriptions</h3>
-  <div class="box">
-    <% for(var i=0; i < prescriptions.length; i++){ %>
-      <div class="item">
-        <input type="checkbox">
-      <p class="para"><%= prescriptions[i]%></p>
-    </div>
-    <% } %>
+		<div class="col-lg-4">
+			<h3 class="text-center">Make an Appointment</h3>
+		  		
+		</div>
+
+		
+
+		
+		<div class="col-lg-4">
+			<h3 class="text-center">Upcoming Appointments</h3>
+			
+		</div>
+	</div>
 </div>
-
-
-<label>Date of birth</label>
-<p> <%= user.DoB %> </p>
-<label>gender</label>
-<p> <%= user.gender %> </p>
-<label>Email</label>
-<p> <%= user.email %> </p>
-</div>
-
 <%- include("partials/footer"); -%>

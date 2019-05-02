@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 const userSchema = {
-  _id: String,
+  username: String,
   firstname: String,
   lastname: String,
   DoB: Date,
@@ -26,21 +26,26 @@ const userSchema = {
   employee: String
 };
 const empSchema = {
-  profile: [{
-   userSchema
-  }],
+  profile: userSchema,
   patients: [{
     userSchema
   }]
 };
+const appointSchema = {
+  time: Date,
+  patient: userSchema
+};
 
 const User = mongoose.model("User", userSchema);
 const Employee = mongoose.model("Employee", empSchema);
+const Appointments = mongoose.model("Appointments", appointSchema)
 
 let count = 0;
 let currentuser = new User();
 let portals = [];
 let prescriptions = [];
+let appointments = [];
+let appDate = [];
 
 app.get("/", function(req, res){
   res.sendFile(__dirname+"/views/index.html");
@@ -65,7 +70,7 @@ app.post("/signup", function(req, res){
   console.log(id, firstname, lastname, birthdate, gender, email, password, employee);
 
   const user = new User({
-    _id: id,
+    username: id,
     firstname: firstname,
     lastname: lastname,
     DoB: birthdate,
@@ -90,7 +95,7 @@ app.post("/login", function(req, res){
   var password = req.body.password;
   var employee = req.body.employee;
   
-  User.findOne({_id: userID}, function(err, user){
+  User.findOne({username: userID}, function(err, user){
     if (err){
       console.log(err);
     } else{
@@ -122,34 +127,21 @@ app.get("/adminPage", function(req, res){
 });
 
 app.post("/promote", function(req, res){
-  var promotees = { _id: req.body.patients };
+  var promotees = { username: req.body.patients };
   User.updateMany(
-    { _id: promotees._id },
+    { username: promotees.username },
     {$set: {employee: "on"} },
     {},
     (err,writeResult) => {}
   );
-  User.find({_id: promotees._id})
-  .then(user => {
-    console.log( user );
-    const emp = new Employee({
-      profile:  user,
-      patients: undefined
-    });
-    emp.save();
-  });
-  Employee.find()
-  .then(doc => {
-    console.log( doc);
-  });
+  console.log("--------------------");
   res.redirect("/adminPage");
 });
 
 app.post("/demote", function(req, res){
-  var demotees = { _id: req.body.employees };
-  console.log(demotees._id);
+  var demotees = { username: req.body.employees };
   User.updateMany(
-    { _id: demotees._id },
+    { username: demotees.username },
     {$set: {employee: "off"} },
     {},
     (err,writeResult) => {}
@@ -170,12 +162,16 @@ portals.forEach(function(portal){
     });
     portals.pop();
   } else {
+    Appointments.find({patient: currentuser})
+    .then(doc =>{
+      appDate = doc.date;
+    })
       prescriptions.push("Ibuprofen");
         res.render("patientportal", {
           name: portal.name,
           content: "patient",
           prescriptions: prescriptions,
-          user: currentuser
+          user: currentuser,
         });
         portals.pop();
   }
