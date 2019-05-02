@@ -25,8 +25,17 @@ const userSchema = {
   password: String,
   employee: String
 };
+const empSchema = {
+  profile: [{
+   userSchema
+  }],
+  patients: [{
+    userSchema
+  }]
+};
 
 const User = mongoose.model("User", userSchema);
+const Employee = mongoose.model("Employee", empSchema);
 
 let count = 0;
 let currentuser = new User();
@@ -114,13 +123,25 @@ app.get("/adminPage", function(req, res){
 
 app.post("/promote", function(req, res){
   var promotees = { _id: req.body.patients };
-  console.log(promotees._id);
   User.updateMany(
     { _id: promotees._id },
     {$set: {employee: "on"} },
     {},
     (err,writeResult) => {}
   );
+  User.find({_id: promotees._id})
+  .then(doc => {
+    console.log(doc);
+    const emp = new Employee({
+      profile: doc,
+      patients: undefined
+    });
+    emp.save();
+  });
+  Employee.find()
+  .then(doc => {
+    console.log(doc);
+  });
   res.redirect("/adminPage");
 });
 
@@ -133,6 +154,7 @@ app.post("/demote", function(req, res){
     {},
     (err,writeResult) => {}
   );
+  Employee.deleteMany({}, (writeResult) => {});
   res.redirect("/adminPage");
 });
 
