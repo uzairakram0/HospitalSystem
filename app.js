@@ -20,7 +20,7 @@ const userSchema = {
   _id: String,
   firstname: String,
   lastname: String,
-  DoB: Date,
+  DoB: String,
   gender: String,
   email: String,
   password: String,
@@ -76,8 +76,7 @@ let count = 0;
 let currentuser = new User();
 let currentPatients = new Patient();
 let currentEmployees = new Employee();
-let portals = [];
-let prescriptions = [];
+let allAppointments = [];
 
 app.get("/", function(req, res){
   res.sendFile(__dirname+"/views/index.html");
@@ -131,8 +130,10 @@ app.post("/login", function(req, res){
   var userID = req.body.userid;
   var password = req.body.password;
   var employee = req.body.employee;
-  if(Patient.findOne({'patient._id': userID} != null)){
-    Patient.findOne({'patient._id': userID}, function(err, user){
+  
+  Patient.findOne({'patient._id': userID}, function(err, user){
+    if(user != null){
+      console.log(user);
       if (err){
         console.log(err);
       } else{
@@ -140,27 +141,30 @@ app.post("/login", function(req, res){
           console.log("admin account found");
           res.redirect("/adminPage");
         } else if (user.patient.password === password){
-          currentuser = user;
+          currentPatients = user;
           res.redirect("/patientPortal");
         } else {
           console.log("fail");
         }
       }
-    });
-  } else {
-    Employee.findOne({'emp._id': userID}, function(err, user){
-      if (err){
-        console.log(err);
-      } else{
-        if (user.emp.password === password){
-          currentuser = user;
-          res.redirect("/employeePortal");
-        } else {
-          console.log("fail");
+    } else {
+      Employee.findOne({'emp._id': userID}, function(err, user){
+        if (err){
+          console.log(err);
+        } else{
+          if (user.emp.password === password){
+            currentEmployees = user;
+            res.redirect("/employeePortal");
+          } else {
+            console.log("fail");
+          }
         }
-      }
-    });
-  }
+      });
+    }
+  });
+
+  
+  
 });
 
 app.get("/adminPage", function(req, res){
@@ -212,28 +216,20 @@ app.post("/demote", function(req, res){
 });
 
 app.get("/patientPortal", function(req, res){
-    Patient.find({'patient._id': currentuser._id}, function(err, user){
-      currentuser = user;
-    });
-    prescriptions.push("Ibuprofen");
     res.render("patientportal", {
       content: "Patient Portal",
-      prescriptions: prescriptions,
-      user: currentuser,
-      appointments: currentuser.appointments
+      user: currentPatients,
+      appointments: currentPatients.appointments
     });
 });
 
 app.get("/employeePortal", function(req, res){
-    Employee.find({'emp._id': currentuser._id}, function(err, user){
-      currentuser = user;
-    });
-    prescriptions.push("Ibuprofen");
+  Patient.find({}, function(err, user){
+    console.log(user.appointments);
+  });
     res.render("employeeportal", {
       content: "Employee Portal",
-      prescriptions: prescriptions,
-      user: currentuser,
-      appointments: currentuser.appointments
+      user: currentEmployees
     });
 });
 
@@ -248,7 +244,7 @@ app.post("/makeApp", function(req, res){
     user.save();
     console.log(user);
   });
-
+  res.redirect("/patientPortal")
 });
 app.get("/schedule", function(req, res){
   res.sendFile(__dirname+"schedule-template-master/index.html");

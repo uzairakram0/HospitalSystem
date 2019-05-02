@@ -1,26 +1,55 @@
 <%- include("partials/header"); -%>
-<div id="container">
-  <h1> <%= name %> </h1>
-  <p> <%= content %> </p>
 
-<h3>Patients</h3>
-  <div>
-    <% for(var i=0; i < prescriptions.length; i++){ %>
-      <div class="item">
-        <input type="checkbox">
-      <p class="para"><%= prescriptions[i]%></p>
-    </div>
-    <% } %>
-</div>
+<style type="text/css">
+	#display{
+		overflow: scroll;
+		height: 200px;
+		overflow-x: hidden;
+		outline: .5px lightgrey solid;
+		background-color: #e3ebf7;
+	}
+	
+	#container{
+		background-color: lightblue;
+		outline: lightgrey solid .5px;
+		height: 300px;
+	}
+	button{
+		width: 45%;
+		background-color: lightgrey;
+		color: black;
+		margin-top: 10px;
+		outline: 1px solid black;
+	}
+	#boxes{
+		height: 60px;
+		text-align: center;
+		margin:5px;
+	}
+</style>
 
-</div>
+<div class="container">
+	
+		<div id="col-lg-12">
+		  <h1 class= "text-center"> <%= content %> </p>
+		  <h1><%= user.emp.firstname %> <%= user.emp.lastname %></h1>
+		</div>
+	<div class="row justify-content-around">
+		<div class="col-lg-3" id="container">
+			<h3 class="text-center">User Info</h3>
+			<label>Date of birth</label>
+				<p> <%= user.emp.DoB %> </p>
+			<label>Gender</label>
+				<p> <%= user.emp.gender %> </p>
+			<label>Email</label>
+				<p> <%= user.emp.email %> </p>
+		</div>
 
-<label>Date of birth</label>
-<p> <%= user.DoB %> </p>
-<label>gender</label>
-<p> <%= user.gender %> </p>
-<label>Email</label>
-<p> <%= user.email %> </p>
+		<div class="col-lg-8 col-lg-offset-1 " id="container">
+			<h3 class="text-center">Schedule View</h3>
+		  		
+		</div>
+	</div>
 </div>
 
 
