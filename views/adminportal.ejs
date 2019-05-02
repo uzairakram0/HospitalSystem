@@ -13,7 +13,7 @@
 		overflow: scroll;
 		height: 200px;
 		overflow-x: hidden;
-		outline: .5px lightgrey solid;
+		outline: .5px solid slategrey;
 	}
 	#adminhead{
 		padding-bottom: 15px;
@@ -37,9 +37,9 @@
           		<form action="/promote" method="post">
           		<ul class="users list-group" id="display">
  			 		<% for(var i=0; i<users.length; i++) { %>
- 			 			<% if(users[i].employee != "on" && users[i].firstname != "admin"){ %>
+ 			 			<% if( users[i].patient.firstname != "admin"){ %>
     						<li class="list-group-item">
-      							<input type="checkbox" name="patients" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input>
+      							<input type="checkbox" name="patients" value="<%= users[i].patient._id %>"><%= users[i].patient.firstname + "  " + users[i].patient.lastname%></input>
     						</li>
     					<% } %>
   					<% } %>
@@ -52,12 +52,12 @@
         	 	<h4 class="text-center"> Employees </h4>
         	 	<form action="/demote" method="post">
          	 		<ul class="users list-group" id="display">
- 				 		<% for(var i=0; i<users.length; i++) { %>
- 				 			<% if(users[i].employee == "on"){ %>
-    							<li class="list-group-item text-center">
-      								<span><input type="checkbox" name ="employees" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input></span>
-    							</li>
-    						<% } %>
+ 				 		<% for(var i=0; i<employees.length; i++) { %>
+ 				 			
+							<li class="list-group-item text-center">
+  								<span><input type="checkbox" name ="employees" value="<%= employees[i].emp._id %>"><%= employees[i].emp.firstname + "  " + employees[i].emp.lastname%></input></span>
+							</li>
+    						
   						<% } %>
   					</ul>	
   					<button class="btn" type="submit">Demote to patient</button>

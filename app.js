@@ -24,13 +24,6 @@ const userSchema = {
   gender: String,
   email: String,
   password: String,
-  employee: String
-};
-const empSchema = {
-  profile: userSchema,
-  patients: [{
-    userSchema
-  }]
 };
 
 const patientSchema = {
@@ -81,6 +74,8 @@ const Patient = mongoose.model("Patient", patientSchema);
 
 let count = 0;
 let currentuser = new User();
+let currentPatients = new Patient();
+let currentEmployees = new Employee();
 let portals = [];
 let prescriptions = [];
 
@@ -114,24 +109,15 @@ app.post("/signup", function(req, res){
     gender: gender,
     email: email,
     password: password,
-    employee: status
   });
 
   user.save();
-
-  if (status === "on"){
-    const employee = new Employee({
-      _id: id,
-      emp: user
-    });
-    employee.save();
-  } else {
-    const patient = new Patient({
-      _id: id,
-      patient: user
-    });
-    patient.save();
-  }
+  
+  const patient = new Patient({
+    _id: id,
+    patient: user
+  });
+  patient.save();
 
   res.redirect("/");
 
@@ -145,90 +131,112 @@ app.post("/login", function(req, res){
   var userID = req.body.userid;
   var password = req.body.password;
   var employee = req.body.employee;
-  
-  Patient.findOne({'patient._id': userID}, function(err, user){
-    if (err){
-      console.log(err);
-    } else{
-      if(user.patient.firstname === "admin"){
-        console.log("admin account found");
-        res.redirect("/adminPage");
-      } else if (user.patient.password === password){
-        let name = user.patient.firstname + " " + user.patient.lastname;
-        const portal = {name};
-
-        portals.push(portal);
-        currentuser = user;
-        res.redirect("/:portalName");
-      } else {
-        console.log("fail");
+  if(Patient.findOne({'patient._id': userID} != null)){
+    Patient.findOne({'patient._id': userID}, function(err, user){
+      if (err){
+        console.log(err);
+      } else{
+        if(user.patient.firstname === "admin"){
+          console.log("admin account found");
+          res.redirect("/adminPage");
+        } else if (user.patient.password === password){
+          currentuser = user;
+          res.redirect("/patientPortal");
+        } else {
+          console.log("fail");
+        }
       }
-    }
-  });
+    });
+  } else {
+    Employee.findOne({'emp._id': userID}, function(err, user){
+      if (err){
+        console.log(err);
+      } else{
+        if (user.emp.password === password){
+          currentuser = user;
+          res.redirect("/employeePortal");
+        } else {
+          console.log("fail");
+        }
+      }
+    });
+  }
 });
 
 app.get("/adminPage", function(req, res){
   Patient.find({}, function(err, user){
-    console.log(user);
-    res.render("adminPortal", {
-      users: user.patient,
-      employment: user.patient.employee
+    currentPatients = user
+  
+    Employee.find({},function(err, user) {
+      currentEmployees = user;
+  
+      res.render("adminPortal", {
+          users: currentPatients,
+          employees: currentEmployees
+      });
     });
   });
 });
-
 app.post("/promote", function(req, res){
-  var promotees = { _id: req.body.patients };
-  Patient.updateMany(
-    { 'patient._id': promotees._id },
-    {$set: {employee: "on"} },
-    {},
-    (err,writeResult) => {}
-  );
+  var promotees = req.body.patients;
+  Patient.findOne({'patient._id': promotees}, function(req, user){
+    console.log(user.patient);
+    console.log("----------------------------------");
+    var tempEmp = new Employee({
+      _id: user._id,
+      emp: user.patient
+    });
+    console.log(tempEmp);
+    tempEmp.save(); 
+  })
+  Patient.deleteMany({'patient._id': promotees},function(){});
   console.log("--------------------");
   res.redirect("/adminPage");
 });
 
 app.post("/demote", function(req, res){
-  var demotees = { _id: req.body.employees };
-  User.updateMany(
-    { 'patient._id': demotees._id },
-    {$set: {employee: "off"} },
-    {},
-    (err,writeResult) => {}
-  );
+  var demotees = req.body.employees;
+  Employee.findOne({'emp._id': demotees}, function(req, user){
+    console.log(user.emp);
+    console.log("----------------------------------");
+    var tempPat = new Patient({
+      _id: user._id,
+      patient: user.emp
+    });
+    console.log(tempPat);
+    tempPat.save(); 
+  })
+  Employee.deleteMany({'emp._id': demotees},function(){});
+  console.log("--------------------");
   res.redirect("/adminPage");
 });
 
-app.get("/:portalName", function(req, res){
-portals.forEach(function(portal){
-  console.log(portal);
-  if(currentuser.employee === "on") {
-    res.render("employeeportal", {
-      name: portal.name,
-      content: "employee",
-      prescriptions: prescriptions,
-      user: currentuser
-    });
-    portals.pop();
-  } else {
+app.get("/patientPortal", function(req, res){
     Patient.find({'patient._id': currentuser._id}, function(err, user){
       currentuser = user;
     });
-    console.log(currentuser.appointments);
-      prescriptions.push("Ibuprofen");
-        res.render("patientportal", {
-          name: portal.name,
-          content: "Patient Portal",
-          prescriptions: prescriptions,
-          user: currentuser,
-          appointments: currentuser.appointments
-        });
-        portals.pop();
-  }
+    prescriptions.push("Ibuprofen");
+    res.render("patientportal", {
+      content: "Patient Portal",
+      prescriptions: prescriptions,
+      user: currentuser,
+      appointments: currentuser.appointments
+    });
+});
 
+app.get("/employeePortal", function(req, res){
+    Employee.find({'emp._id': currentuser._id}, function(err, user){
+      currentuser = user;
+    });
+    prescriptions.push("Ibuprofen");
+    res.render("employeeportal", {
+      content: "Employee Portal",
+      prescriptions: prescriptions,
+      user: currentuser,
+      appointments: currentuser.appointments
+    });
 });
-});
+
 app.post("/makeApp", function(req, res){
   var appDate = req.body.appDate;
   var appTime = req.body.appTime;
