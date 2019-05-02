@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 const userSchema = {
-  _id: String,
+  username: String,
   firstname: String,
   lastname: String,
   DoB: Date,
@@ -25,6 +25,16 @@ const userSchema = {
   email: String,
   password: String,
   employee: String
+};
+const empSchema = {
+  profile: userSchema,
+  patients: [{
+    userSchema
+  }]
+};
+const appointSchema = {
+  time: Date,
+  patient: userSchema
 };
 
 const patientSchema = {
@@ -68,13 +78,17 @@ const employeeSchema = {
 
 
 const User = mongoose.model("User", userSchema);
+
 const Employee = mongoose.model("Employee", employeeSchema);
 const Patient = mongoose.model("Patient", patientSchema);
+const Appointments = mongoose.model("Appointments", appointSchema)
 
 let count = 0;
 let currentuser = new User();
 let portals = [];
 let prescriptions = [];
+let appointments = [];
+let appDate = [];
 
 app.get("/", function(req, res){
   res.sendFile(__dirname+"/views/index.html");
@@ -99,7 +113,7 @@ app.post("/signup", function(req, res){
   console.log(id, firstname, lastname, birthdate, gender, email, password, status);
 
   const user = new User({
-    _id: id,
+    username: id,
     firstname: firstname,
     lastname: lastname,
     DoB: birthdate,
@@ -137,31 +151,60 @@ app.post("/login", function(req, res){
   var userID = req.body.userid;
   var password = req.body.password;
   var employee = req.body.employee;
-  console.log(userID, password, employee);
-
-
-
-  User.findOne({_id: userID}, function(err, user){
+  
+  User.findOne({username: userID}, function(err, user){
     if (err){
       console.log(err);
     } else{
-      if (user.password === password){
+      if(user.firstname === "admin"){
+        console.log("admin account found");
+        res.redirect("/adminPage");
+      } else if (user.password === password){
         let name = user.firstname + " " + user.lastname;
-        const portal = {
-          name: name
-        };
+        const portal = {name};
 
         portals.push(portal);
           currentuser = user;
         res.redirect("/:portalName");
-        console.log(user.name);
       } else {
         console.log("fail");
       }
     }
 
   });
+});
 
+app.get("/adminPage", function(req, res){
+  User.find({}).exec( function(err, user){
+    res.render("adminPortal", {
+      users: user,
+      employment: user.employee
+    });
+  });
+});
+
+app.post("/promote", function(req, res){
+  var promotees = { username: req.body.patients };
+  User.updateMany(
+    { username: promotees.username },
+    {$set: {employee: "on"} },
+    {},
+    (err,writeResult) => {}
+  );
+  console.log("--------------------");
+  res.redirect("/adminPage");
+});
+
+app.post("/demote", function(req, res){
+  var demotees = { username: req.body.employees };
+  User.updateMany(
+    { username: demotees.username },
+    {$set: {employee: "off"} },
+    {},
+    (err,writeResult) => {}
+  );
+  Employee.deleteMany({}, (writeResult) => {});
+  res.redirect("/adminPage");
 });
 
 app.get("/:portalName", function(req, res){
@@ -176,12 +219,16 @@ portals.forEach(function(portal){
     });
     portals.pop();
   } else {
+    Appointments.find({patient: currentuser})
+    .then(doc =>{
+      appDate = doc.date;
+    })
       prescriptions.push("Ibuprofen");
         res.render("patientportal", {
           name: portal.name,
           content: "patient",
           prescriptions: prescriptions,
-          user: currentuser
+          user: currentuser,
         });
         portals.pop();
   }
@@ -192,6 +239,7 @@ portals.forEach(function(portal){
 app.get("/schedule", function(req, res){
   res.sendFile(__dirname+"schedule-template-master/index.html");
 });
+
 
 
 
