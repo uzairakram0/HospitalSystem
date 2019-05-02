@@ -13,9 +13,9 @@
 		overflow: scroll;
 		height: 200px;
 		overflow-x: hidden;
+		outline: .5px lightgrey solid;
 	}
 	#adminhead{
-		border-bottom: 3px lightblue solid;
 		padding-bottom: 15px;
 		padding-top: 0px;
 		font-size: 30px;
@@ -39,7 +39,7 @@
  			 		<% for(var i=0; i<users.length; i++) { %>
  			 			<% if(users[i].employee != "on" && users[i].firstname != "admin"){ %>
     						<li class="list-group-item">
-      							<input type="checkbox" name="patients" value="<%= users[i].username %>"><%= users[i].firstname + "  " + users[i].lastname%></input>
+      							<input type="checkbox" name="patients" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input>
     						</li>
     					<% } %>
   					<% } %>
@@ -55,7 +55,7 @@
  				 		<% for(var i=0; i<users.length; i++) { %>
  				 			<% if(users[i].employee == "on"){ %>
     							<li class="list-group-item text-center">
-      								<span><input type="checkbox" name ="employees" value="<%= users[i].username %>"><%= users[i].firstname + "  " + users[i].lastname%></input></span>
+      								<span><input type="checkbox" name ="employees" value="<%= users[i]._id %>"><%= users[i].firstname + "  " + users[i].lastname%></input></span>
     							</li>
     						<% } %>
   						<% } %>
