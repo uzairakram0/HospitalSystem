@@ -168,18 +168,19 @@ app.post("/login", function(req, res){
 });
 
 app.get("/adminPage", function(req, res){
-  User.find({}).exec( function(err, user){
+  Patient.find({}, function(err, user){
+    console.log(user);
     res.render("adminPortal", {
-      users: user,
-      employment: user.employee
+      users: user.patient,
+      employment: user.patient.employee
     });
   });
 });
 
 app.post("/promote", function(req, res){
   var promotees = { _id: req.body.patients };
-  User.updateMany(
-    { _id: promotees._id },
+  Patient.updateMany(
+    { 'patient._id': promotees._id },
     {$set: {employee: "on"} },
     {},
     (err,writeResult) => {}
@@ -191,7 +192,7 @@ app.post("/promote", function(req, res){
 app.post("/demote", function(req, res){
   var demotees = { _id: req.body.employees };
   User.updateMany(
-    { _id: demotees._id },
+    { 'patient._id': demotees._id },
     {$set: {employee: "off"} },
     {},
     (err,writeResult) => {}
@@ -218,7 +219,7 @@ portals.forEach(function(portal){
       prescriptions.push("Ibuprofen");
         res.render("patientportal", {
           name: portal.name,
-          content: "patient",
+          content: "Patient Portal",
           prescriptions: prescriptions,
           user: currentuser,
           appointments: currentuser.appointments

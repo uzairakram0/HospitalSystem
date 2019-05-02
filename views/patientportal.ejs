@@ -6,7 +6,7 @@
 		height: 200px;
 		overflow-x: hidden;
 		outline: .5px lightgrey solid;
-		background-color: white;
+		background-color: #e3ebf7;
 	}
 	
 	#container{
@@ -63,7 +63,7 @@
  			 		<% if(appointments.length > 0) { %>
  			 			<% for(var i=0; i<appointments.length; i++) { %> 
     						<li>
-      							<div class="box" id="boxes"><h4>Appointment on:</h4><%=appointments[i].date%> <%=appointments[i].time%></div>
+      							<div class="box" id="boxes"><h4 style="margin-bottom: 0px">Appointment on:</h4><%=appointments[i].time%><br/><%=appointments[i].date%></div>
     						</li>
     					<% } %>
   					<% } %>
