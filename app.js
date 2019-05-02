@@ -130,17 +130,17 @@ app.post("/promote", function(req, res){
     (err,writeResult) => {}
   );
   User.find({_id: promotees._id})
-  .then(doc => {
-    console.log(doc);
+  .then(user => {
+    console.log( user );
     const emp = new Employee({
-      profile: doc,
+      profile:  user,
       patients: undefined
     });
     emp.save();
   });
   Employee.find()
   .then(doc => {
-    console.log(doc);
+    console.log( doc);
   });
   res.redirect("/adminPage");
 });
